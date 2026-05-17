@@ -1,0 +1,63 @@
+{\rtf1\ansi\ansicpg1252\cocoartf2867
+\cocoatextscaling0\cocoaplatform0{\fonttbl\f0\fmodern\fcharset0 Courier;}
+{\colortbl;\red255\green255\blue255;\red0\green0\blue0;}
+{\*\expandedcolortbl;;\cssrgb\c0\c0\c0;}
+\paperw11900\paperh16840\margl1440\margr1440\vieww28600\viewh18000\viewkind0
+\deftab720
+\pard\pardeftab720\partightenfactor0
+
+\f0\fs26 \cf0 \expnd0\expndtw0\kerning0
+\outl0\strokewidth0 \strokec2 # Kindly use the jupyter Notebook to run the program. \
+\
+# Import Libraries\
+import numpy as np\
+import pandas as pd\
+import matplotlib.pyplot as plt\
+from sklearn.model_selection import train_test_split\
+from sklearn.preprocessing import PolynomialFeatures\
+from sklearn.linear_model import LinearRegression\
+from sklearn.metrics import mean_squared_error, r2_score\
+\
+\
+# Load Auto MPG Dataset for Polynomial Regression\
+auto_df = pd.read_csv("auto-mpg.csv")\
+print("Polynomial Regression on Auto MPG Dataset")\
+\
+# Drop rows with missing values in the Auto MPG dataset\
+auto_df['horsepower'] = auto_df['horsepower'].replace('?', np.nan).astype(float)\
+auto_df.dropna(inplace=True) #Drop rows with NaN values\
+\
+X = auto_df[['horsepower']]  # Using 'horsepower' as the feature\
+y = auto_df['mpg']  # Target variable\
+\
+# Split the data into training and testing sets\
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)\
+\
+# Transform features to polynomial features (degree=2)\
+poly = PolynomialFeatures(degree=2)\
+X_train_poly = poly.fit_transform(X_train)\
+X_test_poly = poly.transform(X_test)\
+\
+# Create and train the Polynomial Regression model\
+PR_model = LinearRegression()\
+PR_model.fit(X_train_poly, y_train)\
+\
+# Make predictions\
+y_pred = PR_model.predict(X_test_poly)\
+\
+# Evaluate the model\
+mse = mean_squared_error(y_test, y_pred)\
+r2 = r2_score(y_test, y_pred)\
+print(f"Mean Squared Error: \{mse:.4f\}")\
+print(f"R^2 Score: \{r2:.4f\}")\
+\
+# Plot the results\
+plt.scatter(X_test, y_test, color='purple', label='Actual')\
+sorted_indices = X_test.squeeze().argsort()\
+plt.plot(X_test.iloc[sorted_indices], y_pred[sorted_indices], color='red', label='Predicted')\
+plt.xlabel('Horsepower')\
+plt.ylabel('MPG (Miles Per Gallon)')\
+plt.title('Polynomial Regression on Auto MPG Dataset')\
+plt.legend()\
+plt.show()\
+}

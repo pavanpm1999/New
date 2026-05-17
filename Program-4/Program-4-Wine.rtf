@@ -1,0 +1,71 @@
+{\rtf1\ansi\ansicpg1252\cocoartf2867
+\cocoatextscaling0\cocoaplatform0{\fonttbl\f0\fmodern\fcharset0 Courier;}
+{\colortbl;\red255\green255\blue255;\red0\green0\blue0;}
+{\*\expandedcolortbl;;\cssrgb\c0\c0\c0;}
+\paperw11900\paperh16840\margl1440\margr1440\vieww11520\viewh8400\viewkind0
+\deftab720
+\pard\pardeftab720\partightenfactor0
+
+\f0\fs26 \cf0 \expnd0\expndtw0\kerning0
+\outl0\strokewidth0 \strokec2 # Kindly use the jupyter Notebook to run the program. \
+\
+# Load Libraries\
+import numpy as np\
+from sklearn.datasets import load_wine\
+from sklearn.model_selection import train_test_split\
+from sklearn.neighbors import KNeighborsClassifier\
+from sklearn.metrics import accuracy_score, f1_score\
+\
+# from sklearn.datasets import load_wine\
+wine = load_wine()\
+X = wine.data\
+y = wine.target\
+\
+# Split the dataset into training and testing sets\
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=42)\
+\
+# Function to evaluate k-NN for different values of k\
+def cls_knn(X_train, X_test, y_train, y_test, k_values, weighted=False):\
+    results = \{\}\
+    for k in k_values:\
+        if weighted:\
+            # Weighted k-NN\
+            knn = KNeighborsClassifier(n_neighbors=k, weights='distance')\
+        else:\
+            # Regular k-NN\
+            knn = KNeighborsClassifier(n_neighbors=k, weights='uniform')\
+        \
+        # Train the model\
+        knn.fit(X_train, y_train)\
+        \
+        # Make predictions\
+        y_pred = knn.predict(X_test)\
+        \
+        # Calculate accuracy and F1-score\
+        accuracy = accuracy_score(y_test, y_pred)\
+        f1 = f1_score(y_test, y_pred, average='weighted')  # Weighted F1-score for multi-class\
+        results[k] = \{'accuracy': accuracy, 'f1_score': f1\}\
+    return results\
+\
+# Test for different values of k\
+k_values = [1, 3, 5]\
+\
+# Evaluate regular k-NN\
+print("Regular k-NN Results:")\
+regular_knn = cls_knn(X_train, X_test, y_train, y_test, k_values, weighted=False)\
+for k, metrics in regular_knn.items():\
+    print(f"k=\{k\}: Accuracy=\{metrics['accuracy']:.4f\}, F1-Score=\{metrics['f1_score']:.4f\}")\
+\
+# Evaluate weighted k-NN\
+print("\\nWeighted k-NN Results:")\
+weighted_knn = cls_knn(X_train, X_test, y_train, y_test, k_values, weighted=True)\
+for k, metrics in weighted_knn.items():\
+    print(f"k=\{k\}: Accuracy=\{metrics['accuracy']:.4f\}, F1-Score=\{metrics['f1_score']:.4f\}")\
+\
+# Compare performance\
+print("\\nComparison of Regular k-NN and Weighted k-NN:")\
+for k in k_values:\
+    regular_acc = regular_knn[k]['accuracy']\
+    weighted_acc = weighted_knn[k]['accuracy']\
+    print(f"k=\{k\}: Regular k-NN Accuracy=\{regular_acc:.4f\}, Weighted k-NN Accuracy=\{weighted_acc:.4f\}")\
+}
